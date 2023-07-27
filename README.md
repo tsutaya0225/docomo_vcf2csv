@@ -6,7 +6,8 @@ ShiftJIS → \storage\xxxx-xxxx\SD_PIM\
 Unicode → \storage\xxxx-xxxx\com.nttdocomo.android.sdcardbackup\phonebook-utf-8\ <br>
 この二つを直しても、ドコモデータコピーアプリがエラーを吐いて元に戻せず。<br>
 \storage\xxxx-xxxx\Android\data\com.nttdocomo.android.sdcardbackup\ ← 空っぽ<br>
+原因不明<br>
 
-仕様の分かる人教えてください……。<br>
+<hr>
 
-VBScriptでUTF-8が未サポートなのが判明、対応中です。
+面倒なのでPythonに移植中

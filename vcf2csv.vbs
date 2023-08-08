@@ -22,7 +22,7 @@ For Each inputFile In WScript.Arguments
 	'入力ファイルの拡張子を確認
 	If LCase(objFS.GetExtensionName(inputFile))<>"vcf" Then
 		MsgBox "VCFファイルではありません。" & vbCrLf & "終了します。", vbOKOnly+vbInformation, "VCF to CSV"
-		Wscript.Quit
+		WScript.Quit
 	End If
 
 	'出力ファイル名を設定

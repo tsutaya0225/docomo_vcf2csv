@@ -10,4 +10,5 @@ Unicode → \storage\xxxx-xxxx\com.nttdocomo.android.sdcardbackup\phonebook-utf-
 
 <hr>
 
-面倒なのでPythonに移植中
+面倒なのでPythonに移植中……移植完了……何も改善しない……。
+Python版はtkinterdnd2が必要です。

@@ -4,7 +4,7 @@ from tkinterdnd2 import *
 import sys, os
 
 
-# VCFファイルをドロップする場所を作成
+# VCFファイルをドロップするウインドウを作成
 def make_window():
     root = TkinterDnD.Tk()  # ウィンドウ作成
     root.title("docomo VCF to CSV")  # ウィンドウタイトルを設定
@@ -28,13 +28,9 @@ def make_window():
 def file_dropped(event):
     path_str = event.data  # ドロップされたファイルの文字列
     if os.path.isdir(path_str):  # ディレクトリの場合
-        mbox.showinfo(
-            "docomo VCF to CSV", os.path.basename(path_str) + " はVCFファイルではありません。"
-        )
+        mbox.showwarning("docomo VCF to CSV", os.path.basename(path_str) + " はVCFファイルではありません。")
     elif not os.path.splitext(path_str.lower())[1] == ".vcf":
-        mbox.showinfo(
-            "docomo VCF to CSV", os.path.basename(path_str) + " はVCFファイルではありません。"
-        )
+        mbox.sshowwarning("docomo VCF to CSV", os.path.basename(path_str) + " はVCFファイルではありません。")
     else:
         new_path_str = os.path.splitext(path_str)[0] + ".CSV"
         if os.path.exists(new_path_str):
@@ -42,18 +38,24 @@ def file_dropped(event):
                 "docomo VCF to CSV",
                 os.path.basename(new_path_str) + " は既に存在します。\n上書きしますか？",
             ):
-                mbox.showinfo(
-                    "docomo VCF to CSV", os.path.basename(path_str) + " は処理しませんでした。"
-                )
+                mbox.showinfo("docomo VCF to CSV", os.path.basename(path_str) + " は処理しませんでした。")
                 return
         fin = open(path_str, "rb")
-        fout = open(new_path_str, "wb")
         lines = fin.readlines()
+        if lines[0] != b"BEGIN:VCARD\r\n":
+            mbox.showwarning("docomo VCF to CSV", os.path.basename(path_str) + " はVCF形式ではありません。")
+            return
+        fout = open(new_path_str, "wb")
         for line in lines:
-            line = b'"' + line
-            line = line.replace(b"\r", b'"')
-            line = line.replace(b"\n", b",")
-            fout.write(line)
+            if line == b"X-DCM-EXPORT:manual\r\n":
+                pass
+            elif line == b"END:VCARD\r\n":
+                fout.write(line)
+            else:
+                line = line.replace(b'"', b'""')
+                line = b'"' + line
+                line = line.replace(b"\r\n", b'",')
+                fout.write(line)
         fin.close()
         fout.close()
         mbox.showinfo("docomo VCF to CSV", "処理を終了しました。")

@@ -59,7 +59,6 @@ def file_dropped(event):
         fin.close()
         fout.close()
         mbox.showinfo("docomo VCF to CSV", "処理を終了しました。")
-        sys.exit()
 
 
 # 終了処理

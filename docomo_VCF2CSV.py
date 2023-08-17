@@ -30,7 +30,7 @@ def file_dropped(event):
     if os.path.isdir(path_str):  # ディレクトリの場合
         mbox.showwarning("docomo VCF to CSV", os.path.basename(path_str) + " はVCFファイルではありません。")
     elif not os.path.splitext(path_str.lower())[1] == ".vcf":
-        mbox.sshowwarning("docomo VCF to CSV", os.path.basename(path_str) + " はVCFファイルではありません。")
+        mbox.showwarning("docomo VCF to CSV", os.path.basename(path_str) + " はVCFファイルではありません。")
     else:
         new_path_str = os.path.splitext(path_str)[0] + ".CSV"
         if os.path.exists(new_path_str):

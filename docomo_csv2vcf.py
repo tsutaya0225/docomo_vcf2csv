@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox as mbox
 from tkinterdnd2 import *
-import sys, os, csv
+import sys, os, csv, tempfile
 
 
 # VCFファイルをドロップするウインドウを作成
@@ -26,23 +26,28 @@ def make_window():
 
 # ドロップされたファイルの処理
 def file_dropped(event):
-    path_str = event.data  # ドロップされたファイルの文字列
-    if os.path.isdir(path_str):  # ディレクトリの場合
-        mbox.showwarning("docomo CSV to VCF", os.path.basename(path_str) + " はCSVファイルではありません。")
-    elif not os.path.splitext(path_str.lower())[1] == ".csv":
-        mbox.showwarning("docomo CSV to VCF", os.path.basename(path_str) + " はCSVファイルではありません。")
+    str_path = event.data  # ドロップされたファイルの文字列
+    if os.path.isdir(str_path):  # ディレクトリの場合
+        mbox.showwarning("docomo CSV to VCF", os.path.basename(str_path) + " はCSVファイルではありません。")
+    elif not os.path.splitext(str_path.lower())[1] == ".csv":
+        mbox.showwarning("docomo CSV to VCF", os.path.basename(str_path) + " はCSVファイルではありません。")
     else:
-        new_path_str = os.path.splitext(path_str)[0] + ".VCF"
-        if os.path.exists(new_path_str):
+        str_new_path = os.path.splitext(str_path)[0] + ".VCF"
+        if os.path.exists(str_new_path):
             if not mbox.askyesno(
                 "docomo CSV to VCF",
-                os.path.basename(new_path_str) + " は既に存在します。\n上書きしますか？",
+                os.path.basename(str_new_path) + " は既に存在します。\n上書きしますか？",
             ):
-                mbox.showinfo("docomo CSV to VCF", os.path.basename(path_str) + " は処理しませんでした。")
+                mbox.showinfo("docomo CSV to VCF", os.path.basename(str_path) + " は処理しませんでした。")
                 return
-        tmp_path_str = os.path.splitext(path_str)[0] + ".tmp"
-        fin = open(path_str, "r")
-        ftmp = open(tmp_path_str, "w", encoding="utf-8", newline="")
+
+        # テンポラリファイルとして安全なファイル名を生成する
+        fp = tempfile.NamedTemporaryFile()
+        str_tmp_path = fp.name
+        fp.close()
+
+        fin = open(str_path, "r")
+        ftmp = open(str_tmp_path, "w", encoding="utf-8", newline="")
         lines = fin.readlines()
         for line in lines:
             line = line.rstrip(",")
@@ -50,8 +55,8 @@ def file_dropped(event):
         fin.close()
         ftmp.close()
 
-        ftmp = open(tmp_path_str, "r", encoding="utf-8", newline="")
-        fout = open(new_path_str, "w", encoding="utf-8")
+        ftmp = open(str_tmp_path, "r", encoding="utf-8", newline="")
+        fout = open(str_new_path, "w", encoding="utf-8")
         reader = csv.reader(ftmp)
         count = 0
         for row in reader:
@@ -66,7 +71,7 @@ def file_dropped(event):
 
         fout.close()
         ftmp.close()
-        os.remove(tmp_path_str)
+        os.remove(str_tmp_path)
         mbox.showinfo("docomo CSV to VCF", "処理を終了しました。")
         sys.exit()
 

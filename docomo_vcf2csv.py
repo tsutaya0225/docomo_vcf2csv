@@ -19,35 +19,37 @@ def make_window():
 
     # 終了ボタンを表示
     button = tk.Button(root, width=10, height=2, text="終了", command=exit_clicked)
-    button.pack(side=tk.BOTTOM, anchor=tk.SE, padx=10, pady=10)
+    button.pack(side=tk.BOTTOM, anchor=tk.SE, tmp_strpadx=10, pady=10)
 
     root.mainloop()
 
 
 # ドロップされたファイルの処理
 def file_dropped(event):
-    path_str = event.data  # ドロップされたファイルの文字列
-    if os.path.isdir(path_str):  # ディレクトリの場合
-        mbox.showwarning("docomo VCF to CSV", os.path.basename(path_str) + " はVCFファイルではありません。")
-    elif not os.path.splitext(path_str.lower())[1] == ".vcf":
-        mbox.showwarning("docomo VCF to CSV", os.path.basename(path_str) + " はVCFファイルではありません。")
+    str_path = event.data  # ドロップされたファイルの文字列
+    if os.path.isdir(str_path):  # ディレクトリの場合
+        mbox.showwarning("docomo VCF to CSV", os.path.basename(str_path) + " はVCFファイルではありません。")
+    elif not os.path.splitext(str_path.lower())[1] == ".vcf":
+        mbox.showwarning("docomo VCF to CSV", os.path.basename(str_path) + " はVCFファイルではありません。")
     else:
-        new_path_str = os.path.splitext(path_str)[0] + ".CSV"
-        if os.path.exists(new_path_str):
+        str_new_path = os.path.splitext(str_path)[0] + ".CSV"
+        if os.path.exists(str_new_path):
             if not mbox.askyesno(
                 "docomo VCF to CSV",
-                os.path.basename(new_path_str) + " は既に存在します。\n上書きしますか？",
+                os.path.basename(str_new_path) + " は既に存在します。\n上書きしますか？",
             ):
-                mbox.showinfo("docomo VCF to CSV", os.path.basename(path_str) + " は処理しませんでした。")
+                mbox.showinfo("docomo VCF to CSV", os.path.basename(str_path) + " は処理しませんでした。")
                 return
-        fin = open(path_str, "rb")
+
+        # 変換処理
+        fin = open(str_path, "rb")  # 文字コードに依存しないようバイナリで処理
         lines = fin.readlines()
         if lines[0] != b"BEGIN:VCARD\r\n":
-            mbox.showwarning("docomo VCF to CSV", os.path.basename(path_str) + " はVCF形式ではありません。")
+            mbox.showwarning("docomo VCF to CSV", os.path.basename(str_path) + " はVCF形式ではありません。")
             return
-        fout = open(new_path_str, "wb")
+        fout = open(str_new_path, "wb")
         for line in lines:
-            if line == b"X-DCM-EXPORT:manual\r\n":
+            if line == b"X-DCM-EXPORT:manual\r\n":  # 3行目にドコモ独自の文字列があるので無視
                 pass
             elif line == b"END:VCARD\r\n":
                 fout.write(line)
